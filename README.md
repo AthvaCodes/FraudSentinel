@@ -31,16 +31,6 @@ I took a classic C terminal banking project and rebuilt it into a full-stack edu
 
 ---
 
-## Hosting on Render
-
-- **Build Command:**
-  ```bash
-  mkdir -p bin && gcc -Wall -std=c99 c_src/transaction.c c_src/fraud_rules.c c_src/linked_list.c c_src/graph.c c_src/queue.c c_src/stack.c c_src/bst.c c_src/hash_map.c c_src/algorithms.c c_src/c_engine.c -o bin/c_engine -lm && pip install -r requirements.txt
-  ```
-- **Start Command:**
-  ```bash
-  gunicorn app:app
-  ```
 
 ---
 
