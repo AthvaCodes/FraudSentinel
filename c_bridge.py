@@ -7,7 +7,7 @@ from typing import Dict, Any, List, Optional
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 BIN_DIR = os.path.join(BASE_DIR, "bin")
-C_ENGINE_EXE = os.path.join(BIN_DIR, "c_engine.exe")
+C_ENGINE_EXE = os.path.join(BIN_DIR, "c_engine.exe" if sys.platform.startswith("win") else "c_engine")
 
 
 def run_c_engine(command: str, *args: str) -> Dict[str, Any]:
