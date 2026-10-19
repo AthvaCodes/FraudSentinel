@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+
+{% block title %}Account Dossier: {{ account.account_name }}{% endblock %}
+
+{% block content %}
+<div style="margin-bottom:20px;">
+  <a href="{{ url_for('accounts.list_accounts') }}" class="btn btn-secondary btn-sm">&larr; Back to Accounts Directory</a>
+</div>
+
+<!-- Account Dossier Header Grid -->
+<div class="stats-grid">
+  <div class="stat-card cyan">
+    <div class="stat-header">
+      <span>CURRENT LEDGER BALANCE</span>
+      <span>🏦</span>
+    </div>
+    <div class="stat-value">₹{{ "{:,.2f}".format(account.balance) }}</div>
+    <div class="stat-sub">Baseline liquidity in system</div>
+  </div>
+
+  <div class="stat-card rose">
+    <div class="stat-header">
+      <span>TOTAL OUTFLOW (DEBITS)</span>
+      <span>📤</span>
+    </div>
+    <div class="stat-value">₹{{ "{:,.2f}".format(account.total_sent) }}</div>
+    <div class="stat-sub">{{ outgoing|length }} outgoing transactions</div>
+  </div>
+
+  <div class="stat-card emerald">
+    <div class="stat-header">
+      <span>TOTAL INFLOW (CREDITS)</span>
+      <span>📥</span>
+    </div>
+    <div class="stat-value">₹{{ "{:,.2f}".format(account.total_received) }}</div>
+    <div class="stat-sub">{{ incoming|length }} incoming transfers</div>
+  </div>
+
+  <div class="stat-card {% if account.risk_level == 'HIGH' %}rose{% elif account.risk_level == 'MEDIUM' %}amber{% else %}emerald{% endif %}">
+    <div class="stat-header">
+      <span>RISK CLASSIFICATION</span>
+      <span>🛡️</span>
+    </div>
+    <div class="stat-value">{{ account.risk_level }}</div>
+    <div class="stat-sub">{{ account.flagged_count }} flagged violation alerts</div>
+  </div>
+</div>
+
+<!-- Counterparties Card -->
+<div class="card">
+  <div class="card-header">
+    <div>
+      <div class="card-title">Direct Counterparty Relationships</div>
+      <div class="card-subtitle">Accounts directly transferring funds to or from {{ account.account_name }}</div>
+    </div>
+    <a href="{{ url_for('network.network_view') }}" class="btn btn-secondary btn-sm">Explore in Transfer Network</a>
+  </div>
+  <div class="card-body" style="padding:0;">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Counterparty Account</th>
+            <th>Total Sent To</th>
+            <th>Total Received From</th>
+            <th>Total Interchanges</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if counterparties %}
+            {% for cp_name, data in counterparties.items() %}
+            <tr>
+              <td>
+                <a href="{{ url_for('accounts.account_detail', account_name=cp_name) }}" style="color:#38bdf8;font-weight:600;text-decoration:none;">
+                  {{ cp_name }}
+                </a>
+              </td>
+              <td><span style="color:#f43f5e;">₹{{ "{:,.2f}".format(data.sent_to) }}</span></td>
+              <td><span style="color:#10b981;">₹{{ "{:,.2f}".format(data.recv_from) }}</span></td>
+              <td>{{ data.count }} transaction(s)</td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="4" style="text-align:center;padding:24px;color:#64748b;">No counterparty relationships recorded.</td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Transaction History: Outgoing and Incoming -->
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;">
+  <!-- Outgoing Transfers -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Outgoing Transfers (Sent)</div>
+    </div>
+    <div class="card-body" style="padding:0;">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Beneficiary</th>
+              <th>Amount</th>
+              <th>Risk</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if outgoing %}
+              {% for tx in outgoing %}
+              <tr>
+                <td>#{{ tx.id }}</td>
+                <td>{{ tx.receiver }}</td>
+                <td><strong style="color:#f43f5e;">₹{{ "{:,.2f}".format(tx.amount) }}</strong></td>
+                <td><span class="badge-risk badge-risk-{{ tx.risk_level.lower() }}">{{ tx.risk_level }}</span></td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="4" style="text-align:center;padding:20px;color:#64748b;">No outgoing transfers</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Incoming Transfers -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">Incoming Transfers (Received)</div>
+    </div>
+    <div class="card-body" style="padding:0;">
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Originator</th>
+              <th>Amount</th>
+              <th>Risk</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if incoming %}
+              {% for tx in incoming %}
+              <tr>
+                <td>#{{ tx.id }}</td>
+                <td>{{ tx.sender }}</td>
+                <td><strong style="color:#10b981;">₹{{ "{:,.2f}".format(tx.amount) }}</strong></td>
+                <td><span class="badge-risk badge-risk-{{ tx.risk_level.lower() }}">{{ tx.risk_level }}</span></td>
+              </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="4" style="text-align:center;padding:20px;color:#64748b;">No incoming transfers</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

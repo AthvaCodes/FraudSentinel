@@ -1,0 +1,31 @@
+1|Aarav Sharma|Priya Verma|1500.00|2026-10-18 09:15:00|Dining|0|LOW|0|CLEARED|Verified dining split|
+2|Ananya Iyer|Kavita Rao|3200.00|2026-10-18 10:20:00|Shopping|0|LOW|0|CLEARED|Regular e-commerce purchase|
+3|Rohan Gupta|Deepak Nair|750.50|2026-10-18 11:05:00|Groceries|0|LOW|0|CLEARED|Supermarket payment|
+4|Neha Reddy|Pooja Joshi|4800.00|2026-10-18 11:45:00|Utilities|0|LOW|0|CLEARED|Electricity bill settlement|
+5|Siddharth Menon|Amit Patel|2200.00|2026-10-18 13:10:00|Services|0|LOW|0|CLEARED|Consulting fee|
+6|Rajesh Singhania|Nexus Holdings|75000.00|2026-10-18 14:00:00|Business|2|MEDIUM|1|Large transaction (>= threshold)|INVESTIGATING|Large wire transfer awaiting invoice validation
+7|Vikram Malhotra|Meera Kapoor|25000.00|2026-10-18 15:30:00|Investment|2|MEDIUM|1|Large transaction (>= threshold)|PENDING|High value personal loan repayment
+8|Suresh Oberoi|Sun Enterprises|125000.00|2026-10-18 16:15:00|Real Estate|2|MEDIUM|1|Large transaction (>= threshold)|BLOCKED|Suspicious unverified overseas beneficiary
+9|Manish Agarwal|Royal Jewelers|14500.00|2026-10-18 17:00:00|Luxury Goods|2|MEDIUM|1|Large transaction (>= threshold)|PENDING|Gold purchase exceeding alert threshold
+10|Karan Desai|Vendor Alpha|850.00|2026-10-19 08:00:00|Vendor Pay|0|LOW|0|PENDING||
+11|Karan Desai|Vendor Beta|920.00|2026-10-19 08:10:00|Vendor Pay|0|LOW|0|PENDING||
+12|Karan Desai|Vendor Gamma|1100.00|2026-10-19 08:25:00|Vendor Pay|0|LOW|0|PENDING||
+13|Karan Desai|Vendor Delta|650.00|2026-10-19 08:40:00|Vendor Pay|0|LOW|0|PENDING||
+14|Karan Desai|Vendor Epsilon|1400.00|2026-10-19 09:00:00|Vendor Pay|0|LOW|0|INVESTIGATING|Rapid burst of payments across |
+15|Karan Desai|Vendor Zeta|1800.00|2026-10-19 09:15:00|Vendor Pay|2|MEDIUM|1|High activity account|INVESTIGATING|6th outgoing transfer in under two hours
+16|Karan Desai|Offshore Vault|18500.00|2026-10-19 09:30:00|Wire|4|HIGH|1|Large transaction (>= threshold); High activity account|BLOCKED|Both high activity burst and large amount violation
+17|Mule Account A|Mule Account B|9800.00|2026-10-19 10:00:00|Transfer|0|LOW|0|INVESTIGATING|Suspected layer 1 of circular t|
+18|Mule Account B|Mule Account C|9650.00|2026-10-19 10:30:00|Transfer|0|LOW|0|INVESTIGATING|Suspected layer 2 of circular t|
+19|Mule Account C|Mule Account A|9500.00|2026-10-19 11:00:00|Transfer|0|LOW|0|BLOCKED|Circular ring completed back to|
+20|Syndicate Hub|Mule Account X|4900.00|2026-10-19 11:30:00|Disbursement|0|LOW|0|INVESTIGATING|Sub-threshold structured distri|
+21|Syndicate Hub|Mule Account Y|4950.00|2026-10-19 11:35:00|Disbursement|0|LOW|0|INVESTIGATING|Sub-threshold structured distri|
+22|Syndicate Hub|Mule Account Z|4800.00|2026-10-19 11:40:00|Disbursement|0|LOW|0|INVESTIGATING|Sub-threshold structured distri|
+23|TestSenderRule1|TestReceiverRule1|15000.00|2026-10-19 18:21:57|Transfer|2|MEDIUM|1|Large transaction (>= threshold)|PENDING|Rule1 Test
+24|HighActivityTester|Recipient_0|500.00|2026-10-19 18:21:57|Transfer|0|LOW|0|PENDING|Payment 0|
+25|HighActivityTester|Recipient_1|500.00|2026-10-19 18:21:57|Transfer|0|LOW|0|PENDING|Payment 1|
+26|HighActivityTester|Recipient_2|500.00|2026-10-19 18:21:57|Transfer|0|LOW|0|PENDING|Payment 2|
+27|HighActivityTester|Recipient_3|500.00|2026-10-19 18:21:57|Transfer|0|LOW|0|PENDING|Payment 3|
+28|HighActivityTester|Recipient_4|500.00|2026-10-19 18:21:57|Transfer|0|LOW|0|PENDING|Payment 4|
+29|HighActivityTester|Recipient_5|500.00|2026-10-19 18:21:57|Transfer|2|MEDIUM|1|High activity account|PENDING|Payment 5
+30|ValidSender|ValidReceiver|12500.00|2026-10-19 18:22:10|Transfer|2|MEDIUM|1|Large transaction (>= threshold)|PENDING|Test transfer
+31|katan desai|nexus holdings|12500.00|2026-10-19 18:48:18|Transfer|2|MEDIUM|1|Large transaction (>= threshold)|PENDING|

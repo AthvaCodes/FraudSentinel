@@ -1,0 +1,311 @@
+{% extends "base.html" %}
+
+{% block title %}Data Structures & Algorithms Lab{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <div>
+      <div class="card-title">Interactive Data Structures Lab</div>
+      <div class="card-subtitle">
+        Explore live in-memory data structures implemented in C99, visualized in real time.
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <!-- Tabs Header -->
+    <div class="ds-tabs">
+      <button type="button" class="ds-tab-btn active" data-target="tab-linked-list">1. Flagged Linked List</button>
+      <button type="button" class="ds-tab-btn" data-target="tab-graph">2. Adjacency List Graph</button>
+      <button type="button" class="ds-tab-btn" data-target="tab-queue">3. FIFO Review Queue</button>
+      <button type="button" class="ds-tab-btn" data-target="tab-stack">4. LIFO Audit Stack</button>
+      <button type="button" class="ds-tab-btn" data-target="tab-bst">5. Binary Search Tree</button>
+      <button type="button" class="ds-tab-btn" data-target="tab-hashmap">6. Hash Map (Chaining)</button>
+      <button type="button" class="ds-tab-btn" data-target="tab-sorting">7. Sorting & Searching</button>
+    </div>
+
+    <!-- ====================================================================
+         Tab 1: Singly Linked List (FlagNode)
+         ==================================================================== -->
+    <div class="ds-content-panel active" id="tab-linked-list">
+      <div class="ds-explanation-box">
+        <h4 style="color:#fff;font-size:14px;margin-bottom:6px;">Singly Linked List (`FlagNode` in C)</h4>
+        <p style="font-size:13px;color:#94a3b8;margin-bottom:8px;">
+          Directly mirrors the C project's in-memory alert structure: <code>flaggedHead = newNode;</code>.
+          When a large transaction (&ge; ₹10,000) or high activity account is detected, a <code>FlagNode</code> is prepended in <strong>O(1)</strong> time.
+        </p>
+        <div>
+          <span class="complexity-badge">Prepend: O(1)</span>
+          <span class="complexity-badge">Search: O(n)</span>
+          <span class="complexity-badge">Delete: O(n)</span>
+          <span class="complexity-badge">Space: O(n)</span>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <div style="font-size:13px;color:#cbd5e1;">
+          Total Flagged Nodes: <strong id="llTotalNodes" style="color:#fff;">0</strong> &bull;
+          Memory <code>flaggedHead</code> Pointer: <strong id="llHeadAddress" style="color:#38bdf8;font-family:var(--font-mono);">0x0</strong>
+        </div>
+        <button type="button" class="btn btn-secondary btn-sm" onclick="loadLinkedListVisualizer()">
+          <span>🔄</span>
+          <span>Refresh Memory Trace</span>
+        </button>
+      </div>
+
+      <div id="llVisualContainer"></div>
+
+      <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;margin-top:20px;font-size:12px;color:#94a3b8;">
+        <strong>Educational Tradeoff vs. SQLite:</strong>
+        A linked list provides instant O(1) prepending without contiguous memory reallocation.
+        However, it lacks random access O(1) by index, cannot perform binary search, and is volatile in RAM.
+        SQLite complements it by persisting all historical records with durable B-tree indices on disk.
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         Tab 2: Adjacency List Graph
+         ==================================================================== -->
+    <div class="ds-content-panel" id="tab-graph">
+      <div class="ds-explanation-box">
+        <h4 style="color:#fff;font-size:14px;margin-bottom:6px;">Directed Adjacency List Graph (Accounts & Transactions)</h4>
+        <p style="font-size:13px;color:#94a3b8;margin-bottom:8px;">
+          Bank accounts form vertices, and money transfers form directed weighted edges.
+          Enables rapid graph traversal (BFS, DFS), shortest path finding, and circular smurfing / money laundering cycle detection (A &rarr; B &rarr; C &rarr; A).
+        </p>
+        <div>
+          <span class="complexity-badge">Add Vertex: O(1)</span>
+          <span class="complexity-badge">Add Edge: O(1)</span>
+          <span class="complexity-badge">BFS / DFS: O(V + E)</span>
+          <span class="complexity-badge">Cycle Detection: O(V &times; E)</span>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+        <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;">
+          <h4 style="color:#fff;font-size:13px;margin-bottom:10px;">BFS Traversal Step Simulator</h4>
+          <div style="display:flex;gap:10px;margin-bottom:12px;">
+            <input type="text" id="bfsStartAccount" class="form-control" value="Aarav Sharma" placeholder="Start account">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="runGraphBFS()">Run BFS</button>
+          </div>
+          <div id="bfsOutput" style="font-family:var(--font-mono);font-size:11px;max-height:200px;overflow-y:auto;color:#cbd5e1;"></div>
+        </div>
+
+        <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;">
+          <h4 style="color:#fff;font-size:13px;margin-bottom:10px;">DFS Traversal Step Simulator</h4>
+          <div style="display:flex;gap:10px;margin-bottom:12px;">
+            <input type="text" id="dfsStartAccount" class="form-control" value="Aarav Sharma" placeholder="Start account">
+            <button type="button" class="btn btn-secondary btn-sm" onclick="runGraphDFS()">Run DFS</button>
+          </div>
+          <div id="dfsOutput" style="font-family:var(--font-mono);font-size:11px;max-height:200px;overflow-y:auto;color:#cbd5e1;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         Tab 3: FIFO Queue
+         ==================================================================== -->
+    <div class="ds-content-panel" id="tab-queue">
+      <div class="ds-explanation-box">
+        <h4 style="color:#fff;font-size:14px;margin-bottom:6px;">FIFO Review Queue (First-In, First-Out)</h4>
+        <p style="font-size:13px;color:#94a3b8;margin-bottom:8px;">
+          Maintains incoming compliance alerts in strict FIFO order. Guarantees fairness: older alerts are investigated before newer ones, preventing alert starvation during market volume spikes.
+        </p>
+        <div>
+          <span class="complexity-badge">Enqueue: O(1)</span>
+          <span class="complexity-badge">Dequeue: O(1)</span>
+          <span class="complexity-badge">Peek: O(1)</span>
+          <span class="complexity-badge">Space: O(n)</span>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:20px;margin-bottom:16px;font-size:13px;">
+        <div>Queue Size: <strong id="queueSize" style="color:#fff;">0</strong></div>
+        <div>Total Enqueued: <strong id="queueEnqueued" style="color:#10b981;">0</strong></div>
+        <div>Total Dequeued: <strong id="queueDequeued" style="color:#38bdf8;">0</strong></div>
+      </div>
+
+      <div id="queueVisualContainer"></div>
+    </div>
+
+    <!-- ====================================================================
+         Tab 4: LIFO Stack
+         ==================================================================== -->
+    <div class="ds-content-panel" id="tab-stack">
+      <div class="ds-explanation-box">
+        <h4 style="color:#fff;font-size:14px;margin-bottom:6px;">LIFO Audit Stack (Last-In, First-Out)</h4>
+        <p style="font-size:13px;color:#94a3b8;margin-bottom:8px;">
+          Used for investigator action tracking and immediate undo rollbacks. When an analyst clears or blocks a transaction, the decision is pushed onto the top of the stack. Clicking "Undo" pops the most recent action.
+        </p>
+        <div>
+          <span class="complexity-badge">Push: O(1)</span>
+          <span class="complexity-badge">Pop: O(1)</span>
+          <span class="complexity-badge">Peek: O(1)</span>
+          <span class="complexity-badge">Space: O(n)</span>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:20px;margin-bottom:16px;font-size:13px;">
+        <div>Stack Depth: <strong id="stackSize" style="color:#fff;">0</strong></div>
+        <div>Total Pushed: <strong id="stackPushed" style="color:#38bdf8;">0</strong></div>
+        <div>Total Popped (Undone): <strong id="stackPopped" style="color:#f43f5e;">0</strong></div>
+      </div>
+
+      <div id="stackVisualContainer"></div>
+    </div>
+
+    <!-- ====================================================================
+         Tab 5: Binary Search Tree (BST)
+         ==================================================================== -->
+    <div class="ds-content-panel" id="tab-bst">
+      <div class="ds-explanation-box">
+        <h4 style="color:#fff;font-size:14px;margin-bottom:6px;">Binary Search Tree (Transaction Amount Index)</h4>
+        <p style="font-size:13px;color:#94a3b8;margin-bottom:8px;">
+          Organizes transactions hierarchically by amount. Enables fast range queries (e.g. "Find all transfers between ₹5,000 and ₹25,000") in O(h + k) time, and in-order traversal outputs all transactions in sorted order in O(n) time.
+        </p>
+        <div>
+          <span class="complexity-badge">Insert: O(log n) avg</span>
+          <span class="complexity-badge">Search: O(log n) avg</span>
+          <span class="complexity-badge">Range Query: O(h + k)</span>
+          <span class="complexity-badge">In-Order: O(n)</span>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:20px;margin-bottom:16px;font-size:13px;">
+        <div>Total Tree Nodes: <strong id="bstNodesCount" style="color:#fff;">0</strong></div>
+        <div>Min Amount: <strong id="bstMinAmount" style="color:#10b981;">₹0</strong></div>
+        <div>Max Amount: <strong id="bstMaxAmount" style="color:#f43f5e;">₹0</strong></div>
+      </div>
+
+      <!-- Range Query Tool -->
+      <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;margin-bottom:20px;">
+        <h4 style="color:#fff;font-size:13px;margin-bottom:10px;">Interactive BST Range Query [Min &le; Amount &le; Max]</h4>
+        <div style="display:flex;gap:12px;align-items:end;">
+          <div>
+            <label class="form-label">Min Amount (₹)</label>
+            <input type="number" id="bstRangeMin" class="form-control" value="5000" style="width:140px;">
+          </div>
+          <div>
+            <label class="form-label">Max Amount (₹)</label>
+            <input type="number" id="bstRangeMax" class="form-control" value="25000" style="width:140px;">
+          </div>
+          <button type="button" class="btn btn-secondary" onclick="executeBSTRangeQuery()">Query Tree</button>
+        </div>
+        <div id="bstRangeResults" style="margin-top:12px;"></div>
+      </div>
+
+      <h4 style="color:#fff;font-size:13px;margin-bottom:8px;">Hierarchical Tree Structure</h4>
+      <div id="bstVisualContainer"></div>
+    </div>
+
+    <!-- ====================================================================
+         Tab 6: Hash Map (Chaining)
+         ==================================================================== -->
+    <div class="ds-content-panel" id="tab-hashmap">
+      <div class="ds-explanation-box">
+        <h4 style="color:#fff;font-size:14px;margin-bottom:6px;">Separate Chaining Hash Map (Account Activity Counters)</h4>
+        <p style="font-size:13px;color:#94a3b8;margin-bottom:8px;">
+          Computes account transaction frequencies in <strong>O(1)</strong> average time to evaluate Rule 2 (5+ outgoing transfers).
+          Uses the <code>djb2</code> polynomial rolling hash function: <code>hash = ((hash &lt;&lt; 5) + hash) + c</code> modulo 16 buckets.
+        </p>
+        <div>
+          <span class="complexity-badge">Put: O(1) avg</span>
+          <span class="complexity-badge">Get: O(1) avg</span>
+          <span class="complexity-badge">Collisions: Chained</span>
+          <span class="complexity-badge">Buckets: 16</span>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:20px;margin-bottom:16px;font-size:13px;">
+        <div>Buckets: <strong id="hmTotalBuckets" style="color:#fff;">16</strong></div>
+        <div>Total Keys: <strong id="hmTotalItems" style="color:#38bdf8;">0</strong></div>
+        <div>Collisions Handled: <strong id="hmCollisions" style="color:#fbbf24;">0</strong></div>
+        <div>Load Factor (&alpha;): <strong id="hmLoadFactor" style="color:#10b981;">0</strong></div>
+      </div>
+
+      <div id="hashMapVisualContainer"></div>
+    </div>
+
+    <!-- ====================================================================
+         Tab 7: Sorting & Searching Algorithms
+         ==================================================================== -->
+    <div class="ds-content-panel" id="tab-sorting">
+      <div class="ds-explanation-box">
+        <h4 style="color:#fff;font-size:14px;margin-bottom:6px;">Algorithm Lab: Bubble Sort, Merge Sort & Binary Search</h4>
+        <p style="font-size:13px;color:#94a3b8;margin-bottom:8px;">
+          Preserves the educational Bubble Sort from the original C project (<code>sortTransactions()</code>) with complete step-by-step swap traces, contrasted with production O(n log n) Merge Sort and Binary Search.
+        </p>
+        <div>
+          <span class="complexity-badge">Bubble Sort: O(n^2)</span>
+          <span class="complexity-badge">Merge Sort: O(n log n)</span>
+          <span class="complexity-badge">Linear Search: O(n)</span>
+          <span class="complexity-badge">Binary Search: O(log n)</span>
+        </div>
+      </div>
+
+      <!-- Bubble Sort Runner -->
+      <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;margin-bottom:20px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <h4 style="color:#fff;font-size:13px;">Bubble Sort Step-by-Step Trace Demo</h4>
+          <button type="button" id="btnRunBubbleSort" class="btn btn-primary btn-sm">Run Bubble Sort in C</button>
+        </div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:10px;">
+          Comparisons: <strong id="bubbleComparisons" style="color:#fff;">0</strong> &bull;
+          Swaps: <strong id="bubbleSwaps" style="color:#f43f5e;">0</strong>
+        </div>
+        <div id="sortTraceOutput"></div>
+      </div>
+
+      <!-- Search Runner -->
+      <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:16px;">
+        <h4 style="color:#fff;font-size:13px;margin-bottom:12px;">Search Comparison: Linear Search O(n) vs. Binary Search O(log n)</h4>
+        <div style="display:flex;gap:12px;align-items:end;margin-bottom:12px;">
+          <div>
+            <label class="form-label">Target Amount to Find (₹)</label>
+            <input type="number" id="searchTargetAmount" class="form-control" value="10000" style="width:160px;">
+          </div>
+          <button type="button" id="btnRunLinearSearch" class="btn btn-secondary btn-sm">Linear Search O(n)</button>
+          <button type="button" id="btnRunBinarySearch" class="btn btn-primary btn-sm">Binary Search O(log n)</button>
+        </div>
+        <div id="searchTraceOutput"></div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/ds_lab.js') }}"></script>
+<script>
+function runGraphBFS() {
+  const start = document.getElementById('bfsStartAccount').value.trim();
+  const out = document.getElementById('bfsOutput');
+  out.innerHTML = 'Executing BFS in C...';
+  fetch(`/api/ds/graph/bfs?start=${encodeURIComponent(start)}`)
+    .then(r => r.json())
+    .then(data => {
+      let html = '';
+      (data || []).forEach(step => {
+        html += `<div>Step ${step.step}: Account "${step.account}" (Distance: ${step.distance} hops from ${step.parent})</div>`;
+      });
+      out.innerHTML = html || 'No nodes visited';
+    });
+}
+
+function runGraphDFS() {
+  const start = document.getElementById('dfsStartAccount').value.trim();
+  const out = document.getElementById('dfsOutput');
+  out.innerHTML = 'Executing DFS in C...';
+  fetch(`/api/ds/graph/dfs?start=${encodeURIComponent(start)}`)
+    .then(r => r.json())
+    .then(data => {
+      let html = '';
+      (data || []).forEach(step => {
+        html += `<div>Step ${step.step}: Account "${step.account}" (Depth: ${step.depth}, Parent: ${step.parent})</div>`;
+      });
+      out.innerHTML = html || 'No nodes visited';
+    });
+}
+</script>
+{% endblock %}

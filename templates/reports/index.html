@@ -1,0 +1,169 @@
+{% extends "base.html" %}
+
+{% block title %}Executive Fraud Detection & Audit Report{% endblock %}
+
+{% block content %}
+<!-- Print Header (Visible only when printed) -->
+<div class="print-header">
+  <h1 style="font-size:20pt;margin-bottom:4px;">FRAUD SENTINEL BANK - AUDIT REPORT</h1>
+  <div style="font-size:10pt;color:#475569;">
+    Official Transaction Forensics & Risk Detection Dossier &bull; Generated: {{ stats.timestamp or 'Current Ledger' }}
+  </div>
+  <div style="font-size:9pt;color:#64748b;margin-top:6px;">
+    Engine: C99 In-Memory Native Core &bull; Storage: SQLite Relational Database
+  </div>
+</div>
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+  <div>
+    <h2 style="font-size:20px;font-weight:700;color:#fff;">Comprehensive Fraud Detection Report</h2>
+    <div style="font-size:13px;color:#94a3b8;">
+      Reproducing and extending the original C console forensic report functions with live ledger analytics.
+    </div>
+  </div>
+
+  <button type="button" class="btn btn-primary" onclick="window.print()">
+    <span>🖨️</span>
+    <span>Print Formal Audit PDF</span>
+  </button>
+</div>
+
+<!-- Section 1: Executive Transaction Statistics (matching C transactionStatistics()) -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">1. Overall Transaction Statistics</div>
+    <div class="card-subtitle">Derived via calculate_statistics() in C engine</div>
+  </div>
+  <div class="card-body">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));gap:16px;">
+      <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;">
+        <div style="font-size:11px;color:#94a3b8;font-weight:600;">TOTAL TRANSACTIONS</div>
+        <div style="font-size:22px;font-weight:700;color:#fff;margin-top:4px;">{{ stats.total_transactions }}</div>
+      </div>
+      <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;">
+        <div style="font-size:11px;color:#94a3b8;font-weight:600;">TOTAL VOLUME</div>
+        <div style="font-size:22px;font-weight:700;color:#38bdf8;margin-top:4px;">₹{{ "{:,.2f}".format(stats.total_amount) }}</div>
+      </div>
+      <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;">
+        <div style="font-size:11px;color:#94a3b8;font-weight:600;">AVERAGE AMOUNT</div>
+        <div style="font-size:22px;font-weight:700;color:#10b981;margin-top:4px;">₹{{ "{:,.2f}".format(stats.average_amount) }}</div>
+      </div>
+      <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;">
+        <div style="font-size:11px;color:#94a3b8;font-weight:600;">LARGEST TRANSFER</div>
+        <div style="font-size:22px;font-weight:700;color:#f43f5e;margin-top:4px;">₹{{ "{:,.2f}".format(stats.largest_amount) }}</div>
+      </div>
+      <div style="background:#0f172a;border:1px solid #1e293b;border-radius:8px;padding:14px;">
+        <div style="font-size:11px;color:#94a3b8;font-weight:600;">FLAGGED VIOLATIONS</div>
+        <div style="font-size:22px;font-weight:700;color:#fbbf24;margin-top:4px;">{{ stats.flagged_count }}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Section 2: Large Transactions (matching C detectLargeTransactions()) -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">2. Detected Large Transactions (Rule 1: &ge; ₹{{ "{:,.0f}".format(config.large_amount_threshold) }})</div>
+    <div class="card-subtitle">Automatic 2-point penalty applied under risk model</div>
+  </div>
+  <div class="card-body" style="padding:0;">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Tx ID</th>
+            <th>Sender</th>
+            <th>Receiver</th>
+            <th>Amount (INR)</th>
+            <th>Timestamp</th>
+            <th>Risk Level</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for tx in large_transactions %}
+          <tr>
+            <td>#{{ tx.id }}</td>
+            <td><strong>{{ tx.sender }}</strong></td>
+            <td>{{ tx.receiver }}</td>
+            <td><strong style="color:#f43f5e;">₹{{ "{:,.2f}".format(tx.amount) }}</strong></td>
+            <td>{{ tx.timestamp }}</td>
+            <td><span class="badge-risk badge-risk-{{ tx.risk_level.lower() }}">{{ tx.risk_level }}</span></td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Section 3: High Activity Accounts (matching C detectHighActivity()) -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">3. High Activity Accounts (Rule 2: &ge; {{ config.high_activity_threshold }} Outgoing Transfers)</div>
+    <div class="card-subtitle">High velocity accounts flagged for potential structuring / smurfing</div>
+  </div>
+  <div class="card-body" style="padding:0;">
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Account Name</th>
+            <th>Outgoing Transfers</th>
+            <th>Total Volume Disbursed</th>
+            <th>Average Transfer</th>
+            <th>Peak Risk Score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for acc in high_activity_accounts %}
+          <tr>
+            <td><strong>{{ acc.account }}</strong></td>
+            <td><span class="badge-risk badge-risk-high">{{ acc.tx_count }} transfers</span></td>
+            <td>₹{{ "{:,.2f}".format(acc.total_amount) }}</td>
+            <td>₹{{ "{:,.2f}".format(acc.avg_amount) }}</td>
+            <td>{{ acc.max_risk }} points</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Section 4: Money Laundering Circular Rings (Graph Cycle Detection) -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">4. Circular Smurfing Cycles (Detected via C Graph Depth-First Search)</div>
+    <div class="card-subtitle">Rings of accounts channeling funds in loops back to the originator</div>
+  </div>
+  <div class="card-body">
+    {% if cycles %}
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        {% for c in cycles %}
+        <div style="background:#0f172a;border:1px solid #f43f5e;border-radius:8px;padding:12px 16px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <strong style="color:#f43f5e;">⚠️ Money Laundering Circular Cycle Detected ({{ c.length }} hops)</strong>
+            <span class="badge-risk badge-risk-high">CRITICAL INVESTIGATION</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:#fff;">
+            {% for p in c.path %}
+              <span style="background:#1e293b;border:1px solid #334155;padding:3px 8px;border-radius:4px;">{{ p }}</span>
+              {% if not loop.last %}
+                <span style="color:#f43f5e;font-weight:bold;">➔</span>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="color:#10b981;font-size:13px;">No circular laundering rings detected in current ledger topology.</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Print Watermark -->
+<div class="print-watermark">
+  *** CONFIDENTIAL AUDIT REPORT &bull; FOR INTERNAL COMPLIANCE REVIEW &bull; BANK FRAUD DETECTION SYSTEM ***
+</div>
+{% endblock %}

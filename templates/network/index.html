@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block title %}Account Money Flow & Fraud Ring Network{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <div>
+      <div class="card-title">Interactive Transfer Network Graph</div>
+      <div class="card-subtitle">
+        Visualizing money flows between bank accounts using a directed adjacency list graph compiled in C.
+      </div>
+    </div>
+
+    <div style="display:flex;gap:10px;">
+      <button type="button" id="btnToggleCycles" class="btn btn-danger btn-sm" title="Detect smurfing rings (A -> B -> C -> A)">
+        <span>🔄</span>
+        <span>Highlight Smurfing Cycles</span>
+      </button>
+      <button type="button" id="btnResetZoom" class="btn btn-secondary btn-sm" title="Reset view">
+        <span>🔍</span>
+        <span>Reset View</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body" style="padding:0;position:relative;">
+    <div class="network-canvas-wrapper">
+      <div class="canvas-toolbar">
+        <span style="font-size:12px;color:#94a3b8;">
+          💡 <strong>Controls:</strong> Drag to move nodes &bull; Scroll wheel to zoom &bull; Click node to inspect dossier
+        </span>
+      </div>
+
+      <!-- Account Dossier Floating Inspector -->
+      <div id="accountDossierCard" style="display:none;position:absolute;bottom:20px;right:20px;background:rgba(15,23,42,0.95);border:1px solid #334155;border-radius:10px;padding:16px;width:280px;box-shadow:var(--shadow-lg);backdrop-filter:blur(6px);z-index:10;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+          <h4 id="dossierName" style="color:#fff;font-size:14px;font-weight:700;"></h4>
+          <span id="dossierRisk" class="badge-risk badge-risk-medium"></span>
+        </div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:4px;">
+          Total Sent: <strong id="dossierSent" style="color:#f43f5e;"></strong>
+        </div>
+        <div style="font-size:12px;color:#94a3b8;margin-bottom:12px;">
+          Total Received: <strong id="dossierReceived" style="color:#10b981;"></strong>
+        </div>
+        <a id="dossierLink" href="#" class="btn btn-primary btn-sm" style="width:100%;">View Full Profile</a>
+      </div>
+
+      <canvas id="networkCanvas"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Forensic Graph Query: Shortest Path Finder -->
+<div class="card">
+  <div class="card-header">
+    <div>
+      <div class="card-title">Transfer Path Forensics (Breadth-First Search)</div>
+      <div class="card-subtitle">Find the shortest chain of intermediary transactions connecting two accounts</div>
+    </div>
+  </div>
+  <div class="card-body">
+    <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:14px;align-items:end;">
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">Origin Account (Start)</label>
+        <input type="text" id="pathStartAccount" class="form-control" placeholder="e.g. Mule Account A" value="Mule Account A">
+      </div>
+      <div class="form-group" style="margin:0;">
+        <label class="form-label">Destination Account (End)</label>
+        <input type="text" id="pathEndAccount" class="form-control" placeholder="e.g. Mule Account C" value="Mule Account C">
+      </div>
+      <div>
+        <button type="button" class="btn btn-primary" onclick="findShortestTransferPath()">
+          <span>🔍</span>
+          <span>Trace Path in C</span>
+        </button>
+      </div>
+    </div>
+
+    <div id="pathResultsBox" style="margin-top:16px;display:none;background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;"></div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/network_graph.js') }}"></script>
+<script>
+function findShortestTransferPath() {
+  const start = document.getElementById('pathStartAccount').value.trim();
+  const end = document.getElementById('pathEndAccount').value.trim();
+  const box = document.getElementById('pathResultsBox');
+
+  if (!start || !end) {
+    alert("Please enter both start and destination account names.");
+    return;
+  }
+
+  box.style.display = 'block';
+  box.innerHTML = '<span style="color:#94a3b8;">Computing BFS shortest transfer path in C engine...</span>';
+
+  fetch(`/api/network/path?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.found) {
+        let html = `<div style="color:#10b981;font-weight:700;margin-bottom:8px;">Path Found (${data.hops} hops):</div>`;
+        html += '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
+        data.path.forEach((acc, i) => {
+          html += `<span style="background:#1e293b;border:1px solid #3b82f6;color:#fff;padding:4px 8px;border-radius:4px;font-weight:600;">${acc}</span>`;
+          if (i < data.path.length - 1) {
+            html += '<span style="color:#38bdf8;font-weight:bold;">➔</span>';
+          }
+        });
+        html += '</div>';
+        box.innerHTML = html;
+      } else {
+        box.innerHTML = `<span style="color:#f43f5e;">No transfer path found connecting "${start}" and "${end}".</span>`;
+      }
+    })
+    .catch(err => {
+      box.innerHTML = '<span style="color:#f43f5e;">Error querying path.</span>';
+    });
+}
+</script>
+{% endblock %}

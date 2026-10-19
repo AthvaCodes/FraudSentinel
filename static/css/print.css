@@ -1,0 +1,98 @@
+/* ==========================================================================
+   Print Stylesheet for Official Fraud Detection Reports & Audits
+   ========================================================================== */
+
+@media print {
+  body {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt;
+    line-height: 1.4;
+  }
+
+  .sidebar,
+  .topbar,
+  .topbar-actions,
+  .btn,
+  .pagination-bar,
+  .no-print,
+  .modal-backdrop {
+    display: none !important;
+  }
+
+  .main-content {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .content-body {
+    padding: 0 !important;
+  }
+
+  .card {
+    border: 1px solid #ccc !important;
+    box-shadow: none !important;
+    margin-bottom: 20px !important;
+    background: transparent !important;
+    page-break-inside: avoid;
+  }
+
+  .card-header {
+    background-color: #f1f5f9 !important;
+    color: #0f172a !important;
+    border-bottom: 1px solid #cbd5e1 !important;
+    padding: 10px 14px !important;
+  }
+
+  .card-title {
+    color: #0f172a !important;
+    font-size: 13pt !important;
+  }
+
+  .card-subtitle {
+    color: #475569 !important;
+  }
+
+  .table {
+    border: 1px solid #cbd5e1 !important;
+    color: #000 !important;
+    font-size: 9pt !important;
+  }
+
+  .table th {
+    background-color: #e2e8f0 !important;
+    color: #0f172a !important;
+    border-bottom: 2px solid #94a3b8 !important;
+  }
+
+  .table td {
+    border-bottom: 1px solid #e2e8f0 !important;
+    color: #0f172a !important;
+  }
+
+  .print-header {
+    display: block !important;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #0f172a;
+    padding-bottom: 15px;
+  }
+
+  .print-watermark {
+    display: block !important;
+    text-align: center;
+    font-size: 10pt;
+    color: #64748b;
+    margin-top: 30px;
+    border-top: 1px dashed #cbd5e1;
+    padding-top: 10px;
+  }
+}
+
+.print-header {
+  display: none;
+}
+
+.print-watermark {
+  display: none;
+}

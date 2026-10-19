@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Account Profiles & Customer Dossiers{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <div>
+      <div class="card-title">Bank Account Directory</div>
+      <div class="card-subtitle">Aggregate balances, money flow volumes, and risk scoring across all accounts</div>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <!-- Search and Risk Filter -->
+    <form method="GET" action="{{ url_for('accounts.list_accounts') }}" style="margin-bottom:20px;">
+      <div style="display:flex;gap:12px;max-width:600px;">
+        <input type="text" name="search" class="form-control" placeholder="Search account name..." value="{{ search }}">
+        <select name="risk" class="form-control" style="width:180px;">
+          <option value="ALL">All Risk Levels</option>
+          <option value="LOW" {% if risk_filter == 'LOW' %}selected{% endif %}>LOW</option>
+          <option value="MEDIUM" {% if risk_filter == 'MEDIUM' %}selected{% endif %}>MEDIUM</option>
+          <option value="HIGH" {% if risk_filter == 'HIGH' %}selected{% endif %}>HIGH</option>
+        </select>
+        <button type="submit" class="btn btn-secondary">Filter</button>
+      </div>
+    </form>
+
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Account Name</th>
+            <th>Balance</th>
+            <th>Total Sent</th>
+            <th>Total Received</th>
+            <th>Transactions</th>
+            <th>Flagged</th>
+            <th>Risk Level</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if accounts %}
+            {% for acc in accounts %}
+            <tr>
+              <td>
+                <a href="{{ url_for('accounts.account_detail', account_name=acc.account_name) }}" style="color:#f8fafc;font-weight:600;text-decoration:none;">
+                  {{ acc.account_name }}
+                </a>
+              </td>
+              <td><strong style="color:#10b981;">₹{{ "{:,.2f}".format(acc.balance) }}</strong></td>
+              <td><span style="color:#f43f5e;">₹{{ "{:,.2f}".format(acc.total_sent) }}</span></td>
+              <td><span style="color:#38bdf8;">₹{{ "{:,.2f}".format(acc.total_received) }}</span></td>
+              <td>{{ acc.transaction_count }}</td>
+              <td>
+                {% if acc.flagged_count > 0 %}
+                  <span style="color:#f43f5e;font-weight:bold;">{{ acc.flagged_count }} flagged</span>
+                {% else %}
+                  <span style="color:#64748b;">0</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge-risk badge-risk-{{ acc.risk_level.lower() }}">
+                  {{ acc.risk_level }}
+                </span>
+              </td>
+              <td>
+                <a href="{{ url_for('accounts.account_detail', account_name=acc.account_name) }}" class="btn btn-secondary btn-sm">
+                  View Dossier
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="8" style="text-align:center;padding:36px;color:#64748b;">
+                No accounts match the specified criteria.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ app_title }} | {{ prototype_label }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/print.css') }}" media="print">
+</head>
+<body>
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-badge">{{ prototype_label }}</div>
+        <div class="brand-title">
+          <span>🛡️ FraudSentinel</span>
+        </div>
+        <div class="brand-sub">Bank Fraud Transaction System</div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-title">Core Operations</div>
+        <a href="{{ url_for('dashboard.dashboard_view') }}" class="nav-link {% if request.endpoint == 'dashboard.dashboard_view' %}active{% endif %}">
+          <span class="nav-icon">📊</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('transactions.list_transactions') }}" class="nav-link {% if request.endpoint == 'transactions.list_transactions' %}active{% endif %}">
+          <span class="nav-icon">💳</span>
+          <span>Transactions</span>
+        </a>
+        <a href="{{ url_for('accounts.list_accounts') }}" class="nav-link {% if request.endpoint and 'accounts' in request.endpoint %}active{% endif %}">
+          <span class="nav-icon">👥</span>
+          <span>Account Profiles</span>
+        </a>
+        <a href="{{ url_for('review.review_queue') }}" class="nav-link {% if request.endpoint == 'review.review_queue' %}active{% endif %}">
+          <span class="nav-icon">🚨</span>
+          <span>Review Queue</span>
+        </a>
+
+        <div class="nav-section-title" style="margin-top:16px;">Forensics & Network</div>
+        <a href="{{ url_for('network.network_view') }}" class="nav-link {% if request.endpoint == 'network.network_view' %}active{% endif %}">
+          <span class="nav-icon">🕸️</span>
+          <span>Transfer Network</span>
+        </a>
+        <a href="{{ url_for('reports.fraud_report') }}" class="nav-link {% if request.endpoint == 'reports.fraud_report' %}active{% endif %}">
+          <span class="nav-icon">📑</span>
+          <span>Fraud Reports</span>
+        </a>
+        <a href="{{ url_for('rules.rules_config_view') }}" class="nav-link {% if request.endpoint == 'rules.rules_config_view' %}active{% endif %}">
+          <span class="nav-icon">⚙️</span>
+          <span>Rule Configuration</span>
+        </a>
+
+        <div class="nav-section-title" style="margin-top:16px;">Computer Science</div>
+        <a href="{{ url_for('ds_lab.ds_lab_view') }}" class="nav-link {% if request.endpoint == 'ds_lab.ds_lab_view' %}active{% endif %}">
+          <span class="nav-icon">🧪</span>
+          <span>Data Structures Lab</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div><strong>Native Engine:</strong> C99 GCC (32-bit)</div>
+        <div class="c-engine-pill">
+          <span class="pulse-dot"></span>
+          <span>In-Memory C Core Active</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="main-content">
+      <!-- Top Navigation Bar -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <div class="page-title">{% block title %}Dashboard{% endblock %}</div>
+          <div class="prototype-tag">
+            <span>⚠️</span>
+            <span>Educational Prototype &bull; Not Production Banking</span>
+          </div>
+        </div>
+
+        <div class="topbar-actions">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="openModal('quickTransferModal')">
+            <span>➕</span>
+            <span>New Transfer</span>
+          </button>
+
+          <form action="{{ url_for('seed.reset_seed') }}" method="POST" style="display:inline;" onsubmit="return confirm('Re-seed sample banking dataset with realistic Indian transactions and smurfing rings?');">
+            <button type="submit" class="btn btn-secondary btn-sm" title="Reset sample database">
+              <span>🔄</span>
+              <span>Re-seed Data</span>
+            </button>
+          </form>
+        </div>
+      </header>
+
+      <!-- Content Body -->
+      <div class="content-body">
+        <!-- Flash Messages -->
+        <div class="flash-container">
+          {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+              {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                  <span>{{ message }}</span>
+                  <button type="button" style="background:none;border:none;color:inherit;cursor:pointer;font-weight:bold;" onclick="this.parentElement.remove();">&times;</button>
+                </div>
+              {% endfor %}
+            {% endif %}
+          {% endwith %}
+        </div>
+
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+
+  <!-- Global Modal: Quick Transfer / Add Transaction -->
+  <div class="modal-backdrop" id="quickTransferModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">Initiate Bank Transfer</div>
+        <button type="button" class="modal-close" onclick="closeModal('quickTransferModal')">&times;</button>
+      </div>
+      <form action="{{ url_for('transactions.create_transaction') }}" method="POST">
+        <div class="modal-body">
+          <p style="font-size:12px;color:#94a3b8;margin-bottom:16px;">
+            Transactions are evaluated instantly by the compiled C fraud engine. Amounts &ge; ₹10,000 or high sender activity trigger automatic risk flags.
+          </p>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Sender Account *</label>
+              <input type="text" name="sender" class="form-control" placeholder="e.g. Ramesh Sharma" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Receiver Account *</label>
+              <input type="text" name="receiver" class="form-control" placeholder="e.g. Priya Patel" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Amount (₹ INR) *</label>
+              <input type="number" step="0.01" min="1" name="amount" class="form-control" placeholder="e.g. 15000" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select name="category" class="form-control">
+                <option value="Transfer">Standard Transfer</option>
+                <option value="Business">Business Payment</option>
+                <option value="Investment">Investment</option>
+                <option value="Shopping">Shopping / Retail</option>
+                <option value="Wire">International Wire</option>
+                <option value="Disbursement">Disbursement</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Notes / Purpose (Optional)</label>
+            <input type="text" name="notes" class="form-control" placeholder="e.g. Invoice settlement or consulting fee">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" onclick="closeModal('quickTransferModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Process Transfer</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Global Modal: Transaction Detail Inspector -->
+  <div class="modal-backdrop" id="txDetailModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <div class="modal-title">Transaction Forensics Inspector #<span id="modalTxId"></span></div>
+        <button type="button" class="modal-close" onclick="closeModal('txDetailModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:13px;">
+          <div><strong style="color:#94a3b8;">Sender:</strong> <span id="modalTxSender" style="color:#fff;font-weight:600;"></span></div>
+          <div><strong style="color:#94a3b8;">Receiver:</strong> <span id="modalTxReceiver" style="color:#fff;font-weight:600;"></span></div>
+          <div><strong style="color:#94a3b8;">Amount:</strong> <span id="modalTxAmount" style="color:#38bdf8;font-weight:700;"></span></div>
+          <div><strong style="color:#94a3b8;">Category:</strong> <span id="modalTxCategory" style="color:#fff;"></span></div>
+          <div><strong style="color:#94a3b8;">Timestamp:</strong> <span id="modalTxTimestamp" style="color:#94a3b8;"></span></div>
+          <div><strong style="color:#94a3b8;">Review Status:</strong> <span id="modalTxStatus" style="color:#fff;"></span></div>
+        </div>
+
+        <div style="margin-top:16px;padding:12px;background:#0f172a;border:1px solid #334155;border-radius:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <strong style="color:#f8fafc;">Fraud Risk Score: <span id="modalTxRiskScore"></span> points</strong>
+            <span id="modalTxRiskLevel" class="badge-risk badge-risk-medium"></span>
+          </div>
+          <div style="font-size:12px;color:#cbd5e1;"><strong>Flag Status:</strong> <span id="modalTxFlagged"></span></div>
+          <div style="font-size:12px;color:#94a3b8;margin-top:6px;"><strong>Analyst Notes:</strong> <span id="modalTxNotes"></span></div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeModal('txDetailModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

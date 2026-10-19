@@ -1,0 +1,194 @@
+{% extends "base.html" %}
+
+{% block title %}Transaction Ledger & Audit Trail{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <div>
+      <div class="card-title">Bank Transactions Ledger</div>
+      <div class="card-subtitle">Showing {{ transactions|length }} of {{ total }} records &bull; Durable SQLite database synchronized with in-memory C engine</div>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <a href="{{ url_for('transactions.export_csv') }}" class="btn btn-secondary btn-sm" title="Download ledger in CSV format">
+        <span>📥</span>
+        <span>Export CSV</span>
+      </a>
+      <button type="button" class="btn btn-primary btn-sm" onclick="openModal('quickTransferModal')">
+        <span>➕</span>
+        <span>New Transaction</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <!-- Filter and Search Form -->
+    <form method="GET" action="{{ url_for('transactions.list_transactions') }}" style="margin-bottom:20px;">
+      <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:12px;align-items:end;">
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Search Query</label>
+          <input type="text" name="search" class="form-control" placeholder="Search account, category, or ID..." value="{{ search }}">
+        </div>
+
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Risk Level</label>
+          <select name="risk" class="form-control">
+            <option value="ALL" {% if risk_filter == 'ALL' or not risk_filter %}selected{% endif %}>All Risk Levels</option>
+            <option value="LOW" {% if risk_filter == 'LOW' %}selected{% endif %}>LOW</option>
+            <option value="MEDIUM" {% if risk_filter == 'MEDIUM' %}selected{% endif %}>MEDIUM</option>
+            <option value="HIGH" {% if risk_filter == 'HIGH' %}selected{% endif %}>HIGH</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Status</label>
+          <select name="status" class="form-control">
+            <option value="ALL" {% if status_filter == 'ALL' or not status_filter %}selected{% endif %}>All Statuses</option>
+            <option value="PENDING" {% if status_filter == 'PENDING' %}selected{% endif %}>PENDING</option>
+            <option value="INVESTIGATING" {% if status_filter == 'INVESTIGATING' %}selected{% endif %}>INVESTIGATING</option>
+            <option value="CLEARED" {% if status_filter == 'CLEARED' %}selected{% endif %}>CLEARED</option>
+            <option value="BLOCKED" {% if status_filter == 'BLOCKED' %}selected{% endif %}>BLOCKED</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Min Amount (₹)</label>
+          <input type="number" step="100" name="min_amount" class="form-control" placeholder="0" value="{{ min_amount }}">
+        </div>
+
+        <div class="form-group" style="margin:0;">
+          <label class="form-label">Max Amount (₹)</label>
+          <input type="number" step="100" name="max_amount" class="form-control" placeholder="Max" value="{{ max_amount }}">
+        </div>
+
+        <div>
+          <button type="submit" class="btn btn-secondary" style="height:38px;">Apply Filters</button>
+        </div>
+      </div>
+    </form>
+
+    <!-- Table -->
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>
+              <a href="{{ url_for('transactions.list_transactions', sort_by='id', sort_order='asc' if sort_by == 'id' and sort_order == 'desc' else 'desc', search=search, risk=risk_filter, status=status_filter) }}" style="color:inherit;text-decoration:none;">
+                ID {% if sort_by == 'id' %}{{ '▲' if sort_order == 'asc' else '▼' }}{% endif %}
+              </a>
+            </th>
+            <th>
+              <a href="{{ url_for('transactions.list_transactions', sort_by='sender', sort_order='asc' if sort_by == 'sender' and sort_order == 'desc' else 'desc', search=search, risk=risk_filter, status=status_filter) }}" style="color:inherit;text-decoration:none;">
+                Sender {% if sort_by == 'sender' %}{{ '▲' if sort_order == 'asc' else '▼' }}{% endif %}
+              </a>
+            </th>
+            <th>
+              <a href="{{ url_for('transactions.list_transactions', sort_by='receiver', sort_order='asc' if sort_by == 'receiver' and sort_order == 'desc' else 'desc', search=search, risk=risk_filter, status=status_filter) }}" style="color:inherit;text-decoration:none;">
+                Receiver {% if sort_by == 'receiver' %}{{ '▲' if sort_order == 'asc' else '▼' }}{% endif %}
+              </a>
+            </th>
+            <th>
+              <a href="{{ url_for('transactions.list_transactions', sort_by='amount', sort_order='asc' if sort_by == 'amount' and sort_order == 'desc' else 'desc', search=search, risk=risk_filter, status=status_filter) }}" style="color:inherit;text-decoration:none;">
+                Amount (INR) {% if sort_by == 'amount' %}{{ '▲' if sort_order == 'asc' else '▼' }}{% endif %}
+              </a>
+            </th>
+            <th>Category</th>
+            <th>
+              <a href="{{ url_for('transactions.list_transactions', sort_by='risk_score', sort_order='asc' if sort_by == 'risk_score' and sort_order == 'desc' else 'desc', search=search, risk=risk_filter, status=status_filter) }}" style="color:inherit;text-decoration:none;">
+                Risk {% if sort_by == 'risk_score' %}{{ '▲' if sort_order == 'asc' else '▼' }}{% endif %}
+              </a>
+            </th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if transactions %}
+            {% for tx in transactions %}
+            <tr>
+              <td><strong>#{{ tx.id }}</strong></td>
+              <td>
+                <a href="{{ url_for('accounts.account_detail', account_name=tx.sender) }}" style="color:#f8fafc;text-decoration:none;font-weight:600;">
+                  {{ tx.sender }}
+                </a>
+              </td>
+              <td>
+                <a href="{{ url_for('accounts.account_detail', account_name=tx.receiver) }}" style="color:#94a3b8;text-decoration:none;">
+                  {{ tx.receiver }}
+                </a>
+              </td>
+              <td><strong style="color:#38bdf8;">₹{{ "{:,.2f}".format(tx.amount) }}</strong></td>
+              <td><span style="font-size:12px;color:#cbd5e1;">{{ tx.category }}</span></td>
+              <td>
+                <span class="badge-risk badge-risk-{{ tx.risk_level.lower() }}">
+                  {{ tx.risk_level }} ({{ tx.risk_score }})
+                </span>
+                {% if tx.is_flagged %}
+                  <span title="{{ tx.flag_reason }}" style="cursor:help;margin-left:4px;">🚩</span>
+                {% endif %}
+              </td>
+              <td>
+                <span class="badge-status status-{{ tx.review_status.lower() }}">{{ tx.review_status }}</span>
+              </td>
+              <td>
+                <div style="display:flex;gap:6px;">
+                  <button type="button" class="btn btn-secondary btn-sm" onclick="inspectTransaction({{ tx.id }})" title="Inspect Details">
+                    Inspect
+                  </button>
+                  <form action="{{ url_for('transactions.delete_transaction', tx_id=tx.id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Permanently delete transaction #{{ tx.id }} from C storage and SQLite database?');">
+                    <button type="submit" class="btn btn-secondary btn-sm" style="color:#f43f5e;" title="Delete">
+                      🗑️
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+            <tr>
+              <td colspan="8" style="text-align:center;padding:36px;color:#64748b;">
+                No transactions match the selected filter criteria.
+              </td>
+            </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination-bar">
+      <div>
+        Page <strong>{{ page }}</strong> of <strong>{{ total_pages }}</strong> (Total: {{ total }} records)
+      </div>
+
+      <div class="pagination-nav">
+        {% if page > 1 %}
+          <a href="{{ url_for('transactions.list_transactions', page=page-1, search=search, risk=risk_filter, status=status_filter, min_amount=min_amount, max_amount=max_amount, sort_by=sort_by, sort_order=sort_order) }}" class="page-btn">
+            &larr; Prev
+          </a>
+        {% else %}
+          <span class="page-btn disabled">&larr; Prev</span>
+        {% endif %}
+
+        {% for p in range(1, total_pages + 1) %}
+          {% if p == page %}
+            <span class="page-btn active">{{ p }}</span>
+          {% elif p <= 5 or p > total_pages - 2 or (p >= page - 1 and p <= page + 1) %}
+            <a href="{{ url_for('transactions.list_transactions', page=p, search=search, risk=risk_filter, status=status_filter, min_amount=min_amount, max_amount=max_amount, sort_by=sort_by, sort_order=sort_order) }}" class="page-btn">
+              {{ p }}
+            </a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page < total_pages %}
+          <a href="{{ url_for('transactions.list_transactions', page=page+1, search=search, risk=risk_filter, status=status_filter, min_amount=min_amount, max_amount=max_amount, sort_by=sort_by, sort_order=sort_order) }}" class="page-btn">
+            Next &rarr;
+          </a>
+        {% else %}
+          <span class="page-btn disabled">Next &rarr;</span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

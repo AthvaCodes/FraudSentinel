@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+env/
+venv/
+.venv/
+
+# Database & caches
+*.db-journal
+temp_remote_inspect/
+
+# Binary files
+bin/*.exe
+bin/c_engine
+bin/bank_cli
+!bin/.gitkeep

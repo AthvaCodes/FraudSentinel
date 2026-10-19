@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+
+{% block title %}Configurable Fraud Risk Model & Detection Rules{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width:800px;margin:0 auto;">
+  <div class="card-header">
+    <div>
+      <div class="card-title">Fraud Risk Engine Configuration</div>
+      <div class="card-subtitle">
+        Preserving the original C project rules while enabling dynamic threshold tuning and ledger re-evaluation.
+      </div>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <form action="{{ url_for('rules.update_rules') }}" method="POST">
+      <h4 style="color:#fff;font-size:14px;margin-bottom:14px;border-bottom:1px solid #334155;padding-bottom:6px;">
+        1. Detection Thresholds
+      </h4>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Large Transaction Threshold (₹ INR)</label>
+          <input type="number" step="1000" min="1000" name="large_amount_threshold" class="form-control" value="{{ config.large_amount_threshold }}" required>
+          <small style="color:#94a3b8;font-size:11px;">Original default: ₹10,000.00</small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">High Activity Threshold (Outgoing Count)</label>
+          <input type="number" min="1" max="20" name="high_activity_threshold" class="form-control" value="{{ config.high_activity_threshold }}" required>
+          <small style="color:#94a3b8;font-size:11px;">Original default: 5 outgoing transfers</small>
+        </div>
+      </div>
+
+      <h4 style="color:#fff;font-size:14px;margin:20px 0 14px;border-bottom:1px solid #334155;padding-bottom:6px;">
+        2. Rule Penalty Weights (Risk Points)
+      </h4>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Large Transaction Penalty (Points)</label>
+          <input type="number" min="1" max="10" name="large_amount_weight" class="form-control" value="{{ config.large_amount_weight }}" required>
+          <small style="color:#94a3b8;font-size:11px;">Original default: +2 points</small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">High Activity Penalty (Points)</label>
+          <input type="number" min="1" max="10" name="high_activity_weight" class="form-control" value="{{ config.high_activity_weight }}" required>
+          <small style="color:#94a3b8;font-size:11px;">Original default: +2 points</small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Circular Smurfing Ring Penalty (Points)</label>
+          <input type="number" min="1" max="10" name="cycle_weight" class="form-control" value="{{ config.cycle_weight or 3 }}" required>
+          <small style="color:#94a3b8;font-size:11px;">Default: +3 points</small>
+        </div>
+      </div>
+
+      <h4 style="color:#fff;font-size:14px;margin:20px 0 14px;border-bottom:1px solid #334155;padding-bottom:6px;">
+        3. Risk Classification Levels
+      </h4>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">HIGH Risk Cutoff (Score &ge;)</label>
+          <input type="number" min="2" max="15" name="high_risk_threshold" class="form-control" value="{{ config.high_risk_threshold }}" required>
+          <small style="color:#94a3b8;font-size:11px;">Original default: 4 points</small>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">MEDIUM Risk Cutoff (Score &ge;)</label>
+          <input type="number" min="1" max="10" name="medium_risk_threshold" class="form-control" value="{{ config.medium_risk_threshold }}" required>
+          <small style="color:#94a3b8;font-size:11px;">Original default: 2 points</small>
+        </div>
+      </div>
+
+      <div style="background:#0f172a;border:1px solid #334155;border-radius:8px;padding:14px;margin:20px 0;font-size:12px;color:#cbd5e1;">
+        ⚙️ <strong>Dynamic Re-evaluation:</strong> Submitting this form will update the C configuration file, re-evaluate all transactions across memory and disk, update the flagged linked list, and mirror the updated scores to SQLite.
+      </div>
+
+      <div style="display:flex;justify-content:flex-end;gap:12px;">
+        <button type="submit" class="btn btn-primary">Save Rules & Re-Score Ledger</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
