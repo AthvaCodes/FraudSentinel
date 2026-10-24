@@ -5,6 +5,7 @@
 {% block content %}
 <div style="margin-bottom:20px;">
   <a href="{{ url_for('accounts.list_accounts') }}" class="btn btn-secondary btn-sm">&larr; Back to Accounts Directory</a>
+  <a href="{{ url_for('accounts.account_fraud_report', account_name=account.account_name) }}" class="btn btn-primary btn-sm" style="margin-left:8px;">Download AI Fraud Analysis PDF</a>
 </div>
 
 <!-- Account Dossier Header Grid -->

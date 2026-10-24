@@ -20,6 +20,9 @@ I took a classic C terminal banking project and rebuilt it into a full-stack edu
   - **Hash Map:** `djb2` rolling hash with separate chaining for $O(1)$ account activity tracking.
   - **Sorting & Searching:** Step-by-step Bubble Sort (with pass/swap counters) vs. Merge Sort and Binary Search.
 - **Ledger & Reports:** Search, multi-criteria filtering, column sorting, pagination, customer dossiers, CSV export, and printable audit reports.
+- **AI Account Analysis PDF:** Generate a professional AI-written report focused on a customer's account activity, counterparties, and risk indicators.
+
+To enable AI account reports, set `GEMINI_API_KEY` in the server environment. The optional `GEMINI_MODEL` variable selects the model (default: `gemini-3.8-flash`). The report sends account-level transaction records to the Gemini API; keep the key out of source control. PDF generation uses the Python standard library and requires no extra package.
 
 ---
 
